@@ -13,7 +13,7 @@ def resolve_subdomain(subdomain, domain):
 def load_wordlist(filepath):
     try:
         with open(filepath, "r") as file:
-            return [line.stripe() for line in file if [line.stripe()]
+            return [line.strip() for line in file if [line.strip()]]
     except FileNotFoundError:
         print(f"ERROR: Wordlist file '{filepath}' is not correct.")
         exit(1)
@@ -21,10 +21,10 @@ def load_wordlist(filepath):
 def enumerate_subdomain(domain, wordlist, threads=10):
     subdomains = []
     print(f"Starting subdomain enumeration on {domain} ")
-    with ThreadPoolExecutor(max_workers=threads) as excutor:
+    with ThreadPoolExecutor(max_workers=threads) as executor:
         futures = [executor.submit(resolve_subdomain, sub, domain) for sub in wordlist]
         for future in futures:
-            result = future.results()
+            result = future.result()
             if result:
                 subdomains.append(result)
     return subdomains
@@ -36,9 +36,9 @@ def main():
     parser.add_argument("-t", "--threads", type=int, default=10, help="Number of threads")
     args = parser.parse_args()
     
-    wordllist = load_wordlist(args.wordlist)
+    wordlist = load_wordlist(args.wordlist)
     
-    results = enumerate_subdomain(args.domain, wordlist, arg.thread)
+    results = enumerate_subdomain(args.domain, wordlist, args.threads)
     
     print("\nDiscovered Subdomains: ")
     for subdomain, ip in results:
